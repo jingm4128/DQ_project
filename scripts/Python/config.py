@@ -57,6 +57,7 @@ RunGUI_config = {
                     {
                     'database':'us',
                     'px_dist_table':'us.px_dist',
+                    'px_beta_dist_table':'us.px_beta_dist',
                     'px_dist_conviction_table':'us.px_dist_conviction',
                     'px_series_table':'us.equity_daily_recent_alphav'
                     },
@@ -67,7 +68,7 @@ RunGUI_config = {
                     'tools':'pan,wheel_zoom,reset,save',
                     'description_html_file':'E:/Work/PartTime/DQ_Project/scripts/Python/Description.html',
                     'width':350,
-                    'height':280,
+                    'height':500,
                     'line_width':3.5
                     }
                 }
