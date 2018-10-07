@@ -2,7 +2,7 @@
 """
 Created on Sat May  5 00:17:58 2018
 
-@author: IBM
+@author: Jing Ma
 
 
 There will be several choices in the portfolio optimization

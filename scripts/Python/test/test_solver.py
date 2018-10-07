@@ -2,7 +2,7 @@
 """
 Created on Sat Oct  6 22:42:12 2018
 
-@author: IBM
+@author: Jing Ma
 """
 
 from scipy.optimize import fsolve
@@ -13,3 +13,4 @@ def equations(p):
     return (x+y**2-4, math.exp(x) + x*y - 3)
 
 x, y =  fsolve(equations, (1, 1))
+print(x,y)

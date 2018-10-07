@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 Created on Mon Apr  2 00:58:47 2018
+Last modified on 20181007 - added comments
 
-@author: IBM
+@author: Jing Ma
 """
 
 import pandas as pd
@@ -129,7 +130,6 @@ def InsertPXDistManual(data_config, ticker, raw_str):
 
 
 def InsertPxDistCrude(data_config, ticker):
-    
     deprecate_query = 'update '+data_config['px_dist_table']+" set deprecated=True where ticker = '"+ticker+"' and model = 'crude'; commit;"
     print(deprecate_query)
     ExecQuery(data_config['database'], deprecate_query, False, False)

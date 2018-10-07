@@ -2,7 +2,7 @@
 """
 Created on Sun Apr  1 13:54:23 2018
 
-@author: IBM
+@author: Jing Ma
 """
 
 GetData_config = {
@@ -30,10 +30,12 @@ GetData_config = {
                     
                     'Database':
                         {
+                        'db_type':'mysql', # not used now, for future improvements
                         'mysql_database':'us',
                         'mysql_hist_px_table_name':'us.equity_daily_hist_quandl',
                         'mysql_recent_px_table_name':'us.equity_daily_recent_alphav',
-                        'mysql_secmaster_table_name':'us.secmaster'
+                        'mysql_secmaster_table_name':'us.secmaster',
+                        'daily_data_universex':'2000'
                         }                    
                   }
 

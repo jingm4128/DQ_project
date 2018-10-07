@@ -65,5 +65,7 @@ select * from us.equity_daily_recent_alphav where date = '2018-03-27';
 
 select max(date) as max_date, min(date) as min_date, count(*) from us.equity_daily_recent_alphav;
 
+select max(date) as max_date, min(date) as min_date, count(*) from us.equity_daily_hist_alphav;
+
 select date, count(*) from us.equity_daily_recent_alphav group by 1 order by 1 desc;
 

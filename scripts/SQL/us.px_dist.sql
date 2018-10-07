@@ -48,7 +48,7 @@ delete from us.px_dist_conviction where model = 'manual';
 ### LOAD TABLE
 ##################################################
 insert into us.px_dist
-select current_timestamp() as asof_datetime, 'crude' as model, temp.*, 1 as conviction, false
+select current_timestamp() as asof_datetime, 'crude' as model, temp.*, false
 from
 (
 	(select ticker, avg(adj_close), 0.2 from us.equity_daily_recent_alphav group by 1 order by 1,2)

@@ -2,7 +2,7 @@
 """
 Created on Mon Apr  1 10:46:11 2018
 
-@author: IBM
+@author: Jing Ma
 """
 
 #import numpy as np ## not used in this script for now
@@ -37,29 +37,36 @@ def GetData(GetData_config):
     database = GetData_config['Database']['mysql_database']
     px_table_name = GetData_config['Database']['mysql_recent_px_table_name']
     secmaster_table_name = GetData_config['Database']['mysql_secmaster_table_name']
+    daily_data_universex = GetData_config['Database']['daily_data_universex']
     
     raw_dir = data_dir + 'raw/'
     proc_dir = data_dir + 'proc/'
     
     #datex_dict = GetDatexDict(datetime.now())
+    # create different format for the start and enc date to load
     datex_dict = GetDatexDict(datetime.strptime('20180727','%Y%m%d')
                             , datetime.strptime('20171005','%Y%m%d'))
     
+    # load the latest secmaster
     if True:
         print('dumping/processing/loading secmaster data...')
         secm_proc_file_dict = DumpProcSecmasterData(secm_data_dir, secm_col_names, secm_output_col_names,datex_dict)
         LoadData(secm_proc_file_dict, database, secmaster_table_name, True)
     
-    ticker_list = GetTickerList(secmaster_table_name, database, datex_dict)
+    # Get the list of tickers
+    ticker_list = GetTickerList(secmaster_table_name, database, daily_data_universex)
     
+    # Download the price/volume data from AlphaVantage
     print('dumping prices data...')
     raw_file_list = DumpDailyDataFromAlphav(raw_dir, api_key, api_query_timegap_sec, ticker_list, datex_dict, False)
     #print(raw_file_list)
     
+    # Process the data downloaded
     print('processing prices data...')
     proc_file_list = ProcessDailyAlphavData(proc_dir, raw_file_list, col_names, datex_dict, True)
     #print(proc_file_list)
     
+    # Load the data to the database
     print('loading prices data...')
     LoadData(proc_file_list, database, px_table_name, datex_dict, True)
     
@@ -114,14 +121,12 @@ def DumpProcSecmasterData(secm_data_dir, secm_col_names, secm_output_col_names,d
     return proc_file_dict
 
 ### 0.2 Get the ticker list
-def GetTickerList(secmaster_table_name, database, datex_dict):
+def GetTickerList(secmaster_table_name, database, universex):
     get_tickers_query = """ select distinct ticker 
                             from """+secmaster_table_name+ """
                             where date in (select max(date) from """+secmaster_table_name+ """)
-                            #where date >= '"""+datex_dict['start']['datex']+"""'
-                            #and date <= '"""+datex_dict['end']['datex']+"""'
                             #and sector='Health Care'
-                            order by marketCap desc limit 2000
+                            order by marketCap desc limit """ + universex + """
                             ;"""
     print(get_tickers_query)
     ticker_lol = ExecQuery(database,get_tickers_query, True)
