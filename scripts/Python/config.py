@@ -16,8 +16,11 @@ GetData_config = {
                     'AlphaVantage':
                         {
                         'AlphaVantage_api_key':'LF51W0ZIJO1GEGFN',
-                        'AlphaVantage_query_timegap_sec':5,
-                        'AlphaVantage_dir':'E:/Work/PartTime/DQ_Project/data/AlphaVantage/daily_adj/',
+                        'AlphaVantage_query_timegap_sec':20,
+                        'AlphaVantage_dir':
+                                {'us_eqy_daily':'E:/Work/PartTime/DQ_Project/data/AlphaVantage/daily_adj/',
+                                 'crypto':'E:/Work/PartTime/DQ_Project/data/AlphaVantage/cypto_daily_adj/'
+                                },
                         'AlphaVantage_col_names':['date', 'open', 'high', 'low', 'close', 'adj_close', 'volume','cdiv','split_coeff']
                         },
                     
@@ -30,13 +33,28 @@ GetData_config = {
                     
                     'Database':
                         {
-                        'db_type':'mysql', # not used now, for future improvements
-                        'mysql_database':'us',
-                        'mysql_hist_px_table_name':'us.equity_daily_hist_quandl',
-                        'mysql_recent_px_table_name':'us.equity_daily_recent_alphav',
-                        'mysql_secmaster_table_name':'us.secmaster',
-                        'daily_data_universex':'2000'
-                        }                    
+                        'us_eqy':
+                            {
+                            'db_type':'mysql', # not used now, for future improvements
+                            'database':'us',
+                            'mysql_hist_px_table_name':'us.equity_daily_hist_quandl',
+                            'mysql_recent_px_table_name':'us.equity_daily_recent_alphav',
+                            'mysql_secmaster_table_name':'us.secmaster',
+                            'daily_data_universex':'2000'
+                            },
+                        'crypto':
+                            {
+                            'db_type':'mysql', # not used now, for future improvements
+                            'database':'crypto',
+                            'mysql_hist_px_table_name':'crypto.daily_hist_alphav',
+                            'mysql_recent_px_table_name':'crypto.daily_recent_alphav',
+                            'mysql_secmaster_table_name':None,
+                            'pairs_dict':{'BTCUSD':{'symbol':'BTC','market':'USD'},
+                                     'ETHUSD':{'symbol':'ETH','market':'USD'},
+                                     'LTCUSD':{'symbol':'LTC','market':'USD'},
+                                    }
+                            }
+                        }                   
                   }
 
 ExecQuery_config = {

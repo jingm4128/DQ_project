@@ -30,22 +30,22 @@ def GetData(GetData_config):
     secm_data_dir = GetData_config['Secmaster']['secm_dir']
     secm_col_names = GetData_config['Secmaster']['secm_col_names']
     secm_output_col_names = GetData_config['Secmaster']['secm_output_col_names']
-    data_dir = GetData_config['AlphaVantage']['AlphaVantage_dir']
+    data_dir = GetData_config['AlphaVantage']['AlphaVantage_dir']['us_eqy_daily']
     api_key = GetData_config['AlphaVantage']['AlphaVantage_api_key']
     api_query_timegap_sec = GetData_config['AlphaVantage']['AlphaVantage_query_timegap_sec']
     col_names = GetData_config['AlphaVantage']['AlphaVantage_col_names']
-    database = GetData_config['Database']['mysql_database']
-    px_table_name = GetData_config['Database']['mysql_recent_px_table_name']
-    secmaster_table_name = GetData_config['Database']['mysql_secmaster_table_name']
-    daily_data_universex = GetData_config['Database']['daily_data_universex']
+    database = GetData_config['Database']['us_eqy']['database']
+    px_table_name = GetData_config['Database']['us_eqy']['mysql_recent_px_table_name']
+    secmaster_table_name = GetData_config['Database']['us_eqy']['mysql_secmaster_table_name']
+    daily_data_universex = GetData_config['Database']['us_eqy']['daily_data_universex']
     
     raw_dir = data_dir + 'raw/'
     proc_dir = data_dir + 'proc/'
     
     #datex_dict = GetDatexDict(datetime.now())
     # create different format for the start and enc date to load
-    datex_dict = GetDatexDict(datetime.strptime('20180727','%Y%m%d')
-                            , datetime.strptime('20181005','%Y%m%d'))
+    datex_dict = GetDatexDict(datetime.strptime('20181005','%Y%m%d')
+                            , datetime.strptime('20181024','%Y%m%d'))
     
     # load the latest secmaster
     if True:
