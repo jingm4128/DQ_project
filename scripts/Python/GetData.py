@@ -44,8 +44,8 @@ def GetData(GetData_config):
     
     #datex_dict = GetDatexDict(datetime.now())
     # create different format for the start and enc date to load
-    datex_dict = GetDatexDict(datetime.strptime('20181005','%Y%m%d')
-                            , datetime.strptime('20181024','%Y%m%d'))
+    datex_dict = GetDatexDict(datetime.strptime('20180501','%Y%m%d')
+                            , datetime.strptime('20180601','%Y%m%d'))
     
     # load the latest secmaster
     if True:
@@ -58,10 +58,11 @@ def GetData(GetData_config):
     
     # Download the price/volume data from AlphaVantage
     print('dumping prices data...')
-    raw_file_list = DumpDailyDataFromAlphav(raw_dir, api_key, api_query_timegap_sec, ticker_list, datex_dict, False)
+    #raw_file_list = DumpDailyDataFromAlphav(raw_dir, api_key, api_query_timegap_sec, ticker_list, datex_dict, False)
     #print(raw_file_list)
     
     # Process the data downloaded
+    raw_file_list = [raw_dir + '.'.join([t,'20181005','20181024','csv']) for t in ticker_list]
     print('processing prices data...')
     proc_file_list = ProcessDailyAlphavData(proc_dir, raw_file_list, col_names, datex_dict, True)
     #print(proc_file_list)
@@ -254,6 +255,9 @@ def ProcessDailyAlphavData(proc_dir, raw_file_list, col_names, datex_dict, keep_
             data = pd.read_csv(raw_file_name, header=0, names = col_names, index_col=False) 
         except pd.errors.ParserError:
             print('ERROR: Could not parse the data in: ' + raw_file_name)
+            continue
+        except FileNotFoundError:
+            print('ERROR: Could not find the file: ' + raw_file_name)
             continue
         
         if keep_lastest:
