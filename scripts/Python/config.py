@@ -15,13 +15,16 @@ GetData_config = {
                     
                     'AlphaVantage':
                         {
-                        'AlphaVantage_api_key':'LF51W0ZIJO1GEGFN',
-                        'AlphaVantage_query_timegap_sec':20,
-                        'AlphaVantage_dir':
+                        'api_key':'LF51W0ZIJO1GEGFN',
+                        'query_timegap_sec':20,
+                        'dir':
                                 {'us_eqy_daily':'E:/Work/PartTime/DQ_Project/data/AlphaVantage/daily_adj/',
                                  'crypto':'E:/Work/PartTime/DQ_Project/data/AlphaVantage/cypto_daily_adj/'
                                 },
-                        'AlphaVantage_col_names':['date', 'open', 'high', 'low', 'close', 'adj_close', 'volume','cdiv','split_coeff']
+                        'raw_data_columns':
+                                {'us_eqy_daily':['date','open','high','low','close','adj_close','volume','cdiv','split_coeff'],
+                                 'crypto':['date','open','high','low','close','open','high','low','close','volume','mkt_cap']
+                                }
                         },
                     
                     'Secmaster':
@@ -40,7 +43,8 @@ GetData_config = {
                             'mysql_hist_px_table_name':'us.equity_daily_hist_quandl',
                             'mysql_recent_px_table_name':'us.equity_daily_recent_alphav',
                             'mysql_secmaster_table_name':'us.secmaster',
-                            'daily_data_universex':'2000'
+                            'daily_data_universex':'2000',
+                            'db_columns':['ticker','date','open','high','low','close','adj_close','volume','cdiv','split_coeff']
                             },
                         'crypto':
                             {
@@ -50,9 +54,10 @@ GetData_config = {
                             'mysql_recent_px_table_name':'crypto.daily_recent_alphav',
                             'mysql_secmaster_table_name':None,
                             'pairs_dict':{'BTCUSD':{'symbol':'BTC','market':'USD'},
-                                     'ETHUSD':{'symbol':'ETH','market':'USD'},
-                                     'LTCUSD':{'symbol':'LTC','market':'USD'},
-                                    }
+                                          'ETHUSD':{'symbol':'ETH','market':'USD'},
+                                          'LTCUSD':{'symbol':'LTC','market':'USD'},
+                                         },
+                            'db_columns':['ticker','open','high','low','close','volume','mkt_cap']
                             }
                         }                   
                   }

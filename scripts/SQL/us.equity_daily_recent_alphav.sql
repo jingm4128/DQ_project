@@ -69,3 +69,5 @@ select max(date) as max_date, min(date) as min_date, count(*) from us.equity_dai
 
 select date, count(*) from us.equity_daily_recent_alphav group by 1 order by 1 desc;
 
+select date, count(*) from us.equity_daily_hist_alphav group by 1 order by 1 desc;
+

@@ -8,6 +8,7 @@ Created on Mon Apr  1 10:46:11 2018
 #import numpy as np ## not used in this script for now
 import pandas as pd
 from datetime import datetime
+import sys
 import os
 import glob
 from ExecQuery import ExecQuery
@@ -21,6 +22,7 @@ from config import GetData_config
 def main():
     GetData(GetData_config)
     
+    
 
 #########################################
 ### The Function
@@ -30,10 +32,11 @@ def GetData(GetData_config):
     secm_data_dir = GetData_config['Secmaster']['secm_dir']
     secm_col_names = GetData_config['Secmaster']['secm_col_names']
     secm_output_col_names = GetData_config['Secmaster']['secm_output_col_names']
-    data_dir = GetData_config['AlphaVantage']['AlphaVantage_dir']['us_eqy_daily']
-    api_key = GetData_config['AlphaVantage']['AlphaVantage_api_key']
-    api_query_timegap_sec = GetData_config['AlphaVantage']['AlphaVantage_query_timegap_sec']
-    col_names = GetData_config['AlphaVantage']['AlphaVantage_col_names']
+    data_dir = GetData_config['AlphaVantage']['dir']['us_eqy_daily']
+    api_key = GetData_config['AlphaVantage']['api_key']
+    api_query_timegap_sec = GetData_config['AlphaVantage']['query_timegap_sec']
+    raw_data_columns = GetData_config['AlphaVantage']['raw_data_columns']['us_eqy_daily']
+    db_columns = GetData_config['Database']['us_eqy']['db_columns']
     database = GetData_config['Database']['us_eqy']['database']
     px_table_name = GetData_config['Database']['us_eqy']['mysql_recent_px_table_name']
     secmaster_table_name = GetData_config['Database']['us_eqy']['mysql_secmaster_table_name']
@@ -44,27 +47,29 @@ def GetData(GetData_config):
     
     #datex_dict = GetDatexDict(datetime.now())
     # create different format for the start and enc date to load
-    datex_dict = GetDatexDict(datetime.strptime('20180501','%Y%m%d')
-                            , datetime.strptime('20180601','%Y%m%d'))
+    datex_dict = GetDatexDict(datetime.strptime('20181025','%Y%m%d')
+                            , datetime.strptime('20181025','%Y%m%d'))
     
     # load the latest secmaster
     if True:
         print('dumping/processing/loading secmaster data...')
-        secm_proc_file_dict = DumpProcSecmasterData(secm_data_dir, secm_col_names, secm_output_col_names,datex_dict)
-        LoadData(secm_proc_file_dict, database, secmaster_table_name, True)
+        secm_proc_file_list = DumpProcSecmasterData(secm_data_dir, secm_col_names, secm_output_col_names,datex_dict)
+        LoadData(secm_proc_file_list, database, secmaster_table_name, datex_dict, True)
+    
+    #sys.exit()
     
     # Get the list of tickers
     ticker_list = GetTickerList(secmaster_table_name, database, daily_data_universex)
     
     # Download the price/volume data from AlphaVantage
     print('dumping prices data...')
-    #raw_file_list = DumpDailyDataFromAlphav(raw_dir, api_key, api_query_timegap_sec, ticker_list, datex_dict, False)
+    raw_file_list = DumpDailyDataFromAlphav(raw_dir, api_key, api_query_timegap_sec, ticker_list, datex_dict, False)
     #print(raw_file_list)
     
     # Process the data downloaded
-    raw_file_list = [raw_dir + '.'.join([t,'20181005','20181024','csv']) for t in ticker_list]
+    #raw_file_list = [raw_dir + '.'.join([t,'20181005','20181024','csv']) for t in ticker_list]
     print('processing prices data...')
-    proc_file_list = ProcessDailyAlphavData(proc_dir, raw_file_list, col_names, datex_dict, True)
+    proc_file_list = ProcessDailyAlphavData(proc_dir, raw_file_list, raw_data_columns, db_columns, datex_dict, True)
     #print(proc_file_list)
     
     # Load the data to the database
@@ -116,10 +121,10 @@ def DumpProcSecmasterData(secm_data_dir, secm_col_names, secm_output_col_names,d
         data_df_list.append(data[secm_output_col_names])
     
     agg_data = pd.concat(data_df_list, ignore_index=True)
-    proc_file_name = secm_data_dir + 'proc/' + 'proc.' + datex + '.csv'
-    proc_file_dict = {proc_file_name:datex}
+    proc_file_name = secm_data_dir + 'proc/' + 'proc.' + datex + '.' + datex + '.csv'
+    proc_file_list = [proc_file_name]
     agg_data.to_csv(proc_file_name, na_rep='NULL', index=False, header=None)       
-    return proc_file_dict
+    return proc_file_list
 
 ### 0.2 Get the ticker list
 def GetTickerList(secmaster_table_name, database, universex):
@@ -236,7 +241,7 @@ def ProcessQuandlData(proc_dir, raw_file_list, col_names, datex_dict, keep_laste
 
 
 ### 2.2 Process AlphaVantage data - Daily (deprecated)
-def ProcessDailyAlphavData(proc_dir, raw_file_list, col_names, datex_dict, keep_lastest=False):
+def ProcessDailyAlphavData(proc_dir, raw_file_list, raw_data_columns, db_columns, datex_dict, keep_lastest=False):
     proc_file_list = []
     start_datex = datex_dict['start']['datex']
     end_datex = datex_dict['end']['datex']
@@ -252,7 +257,7 @@ def ProcessDailyAlphavData(proc_dir, raw_file_list, col_names, datex_dict, keep_
         i+=1
         # read the data
         try:
-            data = pd.read_csv(raw_file_name, header=0, names = col_names, index_col=False) 
+            data = pd.read_csv(raw_file_name, header=0, names = raw_data_columns, index_col=False) 
         except pd.errors.ParserError:
             print('ERROR: Could not parse the data in: ' + raw_file_name)
             continue
@@ -268,7 +273,7 @@ def ProcessDailyAlphavData(proc_dir, raw_file_list, col_names, datex_dict, keep_
         # transform the format of the data
         data['date'] = pd.to_datetime(data['date']).dt.strftime('%Y/%m/%d')
         data['ticker'] = ticker
-        data_df_list.append(data[ ['ticker']+col_names ])
+        data_df_list.append(data[ db_columns ])
     
     agg_data = pd.concat(data_df_list, ignore_index=True)
     # generate the file name based on the raw file name
@@ -290,10 +295,12 @@ def ProcessMinuteAlphavData(proc_dir, raw_file_list, col_names, datex_dict, keep
 ### 3. LoadData #########################
 def LoadData(proc_file_list, database, table_name, datex_dict, delete=False):
     for f in proc_file_list:
+        print(f)
+        
         if delete:
             del_query = """delete from """ + table_name + """ 
-                           where date >= '""" + datex_dict['start']['datex'] + """'
-                           and date <= '""" + datex_dict['end']['datex'] + """'
+                           where date >= '""" + f.split('.')[1] + """'
+                           and date <= '""" + f.split('.')[2] + """'
                            ; commit;
                         """
             print(del_query)
