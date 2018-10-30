@@ -64,7 +64,7 @@ GetData_config = {
                                           'EOS-USD':{'symbol':'EOS','market':'USD'},
                                           'DASH-USD':{'symbol':'DASH','market':'USD'}
                                          },
-                            'db_columns':['ticker','date','open','high','low','close','volume','mkt_cap']
+                            'db_columns':['ticker','date','open','high','low','close','volume']
                             }
                         }                   
                   }
