@@ -20,7 +20,7 @@ CREATE TABLE us.equity_daily_recent_alphav
     split_coeff float default null
 );
 
-delete from us.equity_daily_recent_alphav where date = '2018-03-27';
+delete from us.equity_daily_recent_alphav where date = '20181025';
 
 delete from us.equity_daily_recent_alphav where date <= '20170101';
 
@@ -71,3 +71,6 @@ select date, count(*) from us.equity_daily_recent_alphav group by 1 order by 1 d
 
 select date, count(*) from us.equity_daily_hist_alphav group by 1 order by 1 desc;
 
+select date, count(*) from us.secmaster group by 1 order by 1 desc;
+
+select * from us.secmaster where date = '20181026';

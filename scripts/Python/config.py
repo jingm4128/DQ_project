@@ -53,11 +53,18 @@ GetData_config = {
                             'mysql_hist_px_table_name':'crypto.daily_hist_alphav',
                             'mysql_recent_px_table_name':'crypto.daily_recent_alphav',
                             'mysql_secmaster_table_name':None,
-                            'pairs_dict':{'BTCUSD':{'symbol':'BTC','market':'USD'},
-                                          'ETHUSD':{'symbol':'ETH','market':'USD'},
-                                          'LTCUSD':{'symbol':'LTC','market':'USD'},
+                            'pairs_dict':{'BTC-USD':{'symbol':'BTC','market':'USD'},
+                                          'ETH-USD':{'symbol':'ETH','market':'USD'},
+                                          'LTC-USD':{'symbol':'LTC','market':'USD'},
+                                          'ETC-USD':{'symbol':'ETC','market':'USD'},
+                                          'USDT-USD':{'symbol':'USDT','market':'USD'},
+                                          'XRP-USD':{'symbol':'XRP','market':'USD'},
+                                          'BCH-USD':{'symbol':'BCH','market':'USD'},
+                                          'NEO-USD':{'symbol':'NEO','market':'USD'},
+                                          'EOS-USD':{'symbol':'EOS','market':'USD'},
+                                          'DASH-USD':{'symbol':'DASH','market':'USD'}
                                          },
-                            'db_columns':['ticker','open','high','low','close','volume','mkt_cap']
+                            'db_columns':['ticker','date','open','high','low','close','volume','mkt_cap']
                             }
                         }                   
                   }

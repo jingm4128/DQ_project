@@ -48,7 +48,7 @@ def GetData(GetData_config):
     #datex_dict = GetDatexDict(datetime.now())
     # create different format for the start and enc date to load
     datex_dict = GetDatexDict(datetime.strptime('20181025','%Y%m%d')
-                            , datetime.strptime('20181025','%Y%m%d'))
+                            , datetime.strptime('20181029','%Y%m%d'))
     
     # load the latest secmaster
     if True:
