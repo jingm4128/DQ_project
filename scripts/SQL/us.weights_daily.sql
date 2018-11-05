@@ -11,9 +11,11 @@ CREATE TABLE us.weights_daily
     asof_datetime datetime not null,
     strategy VARCHAR(10) not null,
     date date not null,
-    ticker VARCHAR(20) not null,
+    symbol VARCHAR(20) not null,
     weights float default 0
 );
+
+ALTER TABLE us.weights_daily CHANGE COLUMN ticker symbol VARCHAR(20);
 
 
 delete from us.weights_daily where date = '2018-03-27';
@@ -33,15 +35,15 @@ commit;
 ##################################################
 select distinct cast(date as char) from us.weights_daily;
 
-select distinct ticker from us.weights_daily;
+select distinct symbol from us.weights_daily;
 
-select * from us.weights_daily where ticker not in (select distinct ticker from us.weights_daily where date = '20180501');
+select * from us.weights_daily where symbol not in (select distinct symbol from us.weights_daily where date = '20180501');
 
 select * from us.weights_daily limit 10;
 
-select * from us.weights_daily where ticker = 'JNJ';
+select * from us.weights_daily where symbol = 'JNJ';
 
-select * from us.weights_daily where ticker = 'TIG';
+select * from us.weights_daily where symbol = 'TIG';
 
 select * from us.weights_daily where date = '2018-03-27';
 

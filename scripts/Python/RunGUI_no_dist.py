@@ -35,13 +35,13 @@ from config import RunGUI_config
 data_config = RunGUI_config['data']
 plot_config = RunGUI_config['plot']
 
-ticker = 'JNJ' #initialize
+symbol = 'JNJ' #initialize
 
 # The descriptions
 desc = Div(text=open(join(dirname(__file__), plot_config['description_html_file'])).read(), width=2*plot_config['width'])
 
 # Set up the px_series_fig
-px_series_results = QueryGUIData(data_config, ticker, 'px_series')
+px_series_results = QueryGUIData(data_config, symbol, 'px_series')
 px_series_df = px_series_results['df']
 volume_unit_str = px_series_results['volume_unit_str']
 px_series_source = ColumnDataSource(data=dict(price=px_series_df['price'], volume=px_series_df['volume'], date=px_series_df['date']))
@@ -65,7 +65,7 @@ px_series_fig.vbar(bottom=0, top='volume', x='date', source=px_series_source, wi
 
 
 # Set up the px_dist_crude_fig
-px_dist_crude_df = QueryGUIData(data_config, ticker, 'px_dist_crude')
+px_dist_crude_df = QueryGUIData(data_config, symbol, 'px_dist_crude')
 px_dist_crude_source = ColumnDataSource(data=dict(price=px_dist_crude_df['price'], prob=px_dist_crude_df['prob']))
 px_dist_crude_hover = HoverTool(tooltips=[("price", "$@{price}{%0.2f}"),("prob", "@{prob}{%0.2f}")]
                                , formatters={'price':'printf','prob':'printf'})
@@ -75,7 +75,7 @@ px_dist_crude_fig.circle('price', 'prob', source=px_dist_crude_source, color='mi
 
 
 # Set up the px_dist_manual_fig
-px_dist_manual_df = QueryGUIData(data_config, ticker, 'px_dist_manual')
+px_dist_manual_df = QueryGUIData(data_config, symbol, 'px_dist_manual')
 px_dist_manual_source = ColumnDataSource(data=dict(price=px_dist_manual_df['price'], prob=px_dist_manual_df['prob']))
 px_dist_manual_hover = HoverTool(tooltips=[("price", "$@{price}{%0.2f}"),("prob", "@{prob}{%0.2f}")]
                                , formatters={'price':'printf','prob':'printf'})
@@ -85,9 +85,9 @@ px_dist_manual_fig.circle('price', 'prob', source=px_dist_manual_source, color='
 
 
 # Set up widgets
-ticker_input_fig = TextInput(title='Current Ticker: JNJ. Input a new ticker: ', value='JNJ')
+symbol_input_fig = TextInput(title='Current symbol: JNJ. Input a new symbol: ', value='JNJ')
 px_dist_manual_input_fig = TextInput(title='Input the "price prob" pairs, separate by ";"', value='e.g. 123.23 0.2')
-px_dist_manual_conviction_input_fig = TextInput(title='Input the conviction of the ticker (1-10)', value='e.g. 7')
+px_dist_manual_conviction_input_fig = TextInput(title='Input the conviction of the symbol (1-10)', value='e.g. 7')
 px_dist_crude_update_button = Button(label='Click to update px_dist_crude')
 px_dist_normalize_button = Button(label='Using raw. Click to normalize px dist')
 
@@ -100,13 +100,13 @@ freq = Slider(title="frequency", value=1.0, start=0.1, end=5.1, step=0.1)
 """
 
 # Set up callbacks
-def UpdateTickerOnChange(attrname, old, new):
-    global ticker
-    ticker = ticker_input_fig.value
-    ticker_input_fig.title = 'Current Ticker: ' + ticker +'. Input a new ticker: '
-    px_dist_manual_conviction_input_fig.title = 'Input the conviction of the ticker (1-10)'
+def UpdatesymbolOnChange(attrname, old, new):
+    global symbol
+    symbol = symbol_input_fig.value
+    symbol_input_fig.title = 'Current symbol: ' + symbol +'. Input a new symbol: '
+    px_dist_manual_conviction_input_fig.title = 'Input the conviction of the symbol (1-10)'
     
-    px_series_results = QueryGUIData(data_config, ticker, 'px_series')
+    px_series_results = QueryGUIData(data_config, symbol, 'px_series')
     px_series_df = px_series_results['df']
     volume_unit_str = px_series_results['volume_unit_str']
     px_series_source.data = dict(price=px_series_df['price'], volume=px_series_df['volume'], date=px_series_df['date'])
@@ -116,52 +116,52 @@ def UpdateTickerOnChange(attrname, old, new):
     px_series_fig.extra_y_ranges['volume'].end = 1.2*px_series_df['volume'].max()
     px_series_fig.yaxis[1].formatter = PrintfTickFormatter(format="%5.1f " + volume_unit_str)
     
-    px_dist_crude_df = QueryGUIData(data_config, ticker, 'px_dist_crude')
+    px_dist_crude_df = QueryGUIData(data_config, symbol, 'px_dist_crude')
     px_dist_crude_source.data = dict(price=px_dist_crude_df['price'], prob=px_dist_crude_df['prob'])
     
-    px_dist_manual_df = QueryGUIData(data_config, ticker, 'px_dist_manual')
+    px_dist_manual_df = QueryGUIData(data_config, symbol, 'px_dist_manual')
     px_dist_manual_source.data = dict(price=px_dist_manual_df['price'], prob=px_dist_manual_df['prob'])
 
 
 def UpdatePxDistManualOnChange(attrname, old, new):
     px_dist_manual_input_fig.title = 'Value updated. Input additional "price prob" pairs, separate by ";"'
-    InsertPXDistManual(data_config, ticker, px_dist_manual_input_fig.value)
+    InsertPXDistManual(data_config, symbol, px_dist_manual_input_fig.value)
     
-    px_dist_manual_df = QueryGUIData(data_config, ticker, 'px_dist_manual')
+    px_dist_manual_df = QueryGUIData(data_config, symbol, 'px_dist_manual')
     px_dist_manual_source.data = dict(price=px_dist_manual_df['price'], prob=px_dist_manual_df['prob'])
 
 
 def UpdatePxDistManualConvictionOnChange(attrname, old, new):
-    px_dist_manual_conviction_input_fig.title = 'Updated. Input a new conviction of the ticker (1-10)'
+    px_dist_manual_conviction_input_fig.title = 'Updated. Input a new conviction of the symbol (1-10)'
     if CanToFloat(px_dist_manual_conviction_input_fig.value):
-        InsertPxDistConviction(data_config, ticker, 'manual', px_dist_manual_conviction_input_fig.value)
+        InsertPxDistConviction(data_config, symbol, 'manual', px_dist_manual_conviction_input_fig.value)
     else:
-        px_dist_manual_conviction_input_fig.title = 'Not Valid. Input a new conviction of the ticker (1-10)'
+        px_dist_manual_conviction_input_fig.title = 'Not Valid. Input a new conviction of the symbol (1-10)'
 
 
 def UpdatePxDistCrudeOnChange():
     px_dist_crude_update_button.label = 'Updated. Click again to update px_dist_crude'
-    InsertPxDistCrude(data_config, ticker)
+    InsertPxDistCrude(data_config, symbol)
     
-    px_dist_crude_df = QueryGUIData(data_config, ticker, 'px_dist_crude')
+    px_dist_crude_df = QueryGUIData(data_config, symbol, 'px_dist_crude')
     px_dist_crude_source.data = dict(price=px_dist_crude_df['price'], prob=px_dist_crude_df['prob'])
 
 def NormalizePxDistOnChange():
     if px_dist_normalize_button.label == 'Using raw. Click to normalize px dist':
         px_dist_normalize_button.label = 'Normalized. Click again to use raw px dist'
         
-        px_dist_crude_df = QueryGUIData(data_config, ticker, 'px_dist_crude', True)
+        px_dist_crude_df = QueryGUIData(data_config, symbol, 'px_dist_crude', True)
         px_dist_crude_source.data = dict(price=px_dist_crude_df['price'], prob=px_dist_crude_df['prob'])
         
-        px_dist_manual_df = QueryGUIData(data_config, ticker, 'px_dist_manual', True)
+        px_dist_manual_df = QueryGUIData(data_config, symbol, 'px_dist_manual', True)
         px_dist_manual_source.data = dict(price=px_dist_manual_df['price'], prob=px_dist_manual_df['prob'])
     elif px_dist_normalize_button.label == 'Normalized. Click again to use raw px dist':
         px_dist_normalize_button.label = 'Using raw. Click to normalize px dist'
         
-        px_dist_crude_df = QueryGUIData(data_config, ticker, 'px_dist_crude', False)
+        px_dist_crude_df = QueryGUIData(data_config, symbol, 'px_dist_crude', False)
         px_dist_crude_source.data = dict(price=px_dist_crude_df['price'], prob=px_dist_crude_df['prob'])
         
-        px_dist_manual_df = QueryGUIData(data_config, ticker, 'px_dist_manual', False)
+        px_dist_manual_df = QueryGUIData(data_config, symbol, 'px_dist_manual', False)
         px_dist_manual_source.data = dict(price=px_dist_manual_df['price'], prob=px_dist_manual_df['prob'])
     else:
         px_dist_normalize_button.label = 'Unexpected px_dist_normalize_button.label! Contact support.'
@@ -184,7 +184,7 @@ for w in [offset, amplitude, phase, freq]:
 # update
 px_dist_manual_input_fig.on_change('value', UpdatePxDistManualOnChange)
 px_dist_manual_conviction_input_fig.on_change('value', UpdatePxDistManualConvictionOnChange)
-ticker_input_fig.on_change('value', UpdateTickerOnChange)
+symbol_input_fig.on_change('value', UpdatesymbolOnChange)
 px_dist_crude_update_button.on_click(UpdatePxDistCrudeOnChange)
 px_dist_normalize_button.on_click(NormalizePxDistOnChange)
 
@@ -192,7 +192,7 @@ px_dist_normalize_button.on_click(NormalizePxDistOnChange)
 
 # Set up layouts and add to document
 #interactions = widgetbox(text, offset, amplitude, phase, freq)
-interactions = widgetbox(ticker_input_fig, px_dist_manual_input_fig, px_dist_manual_conviction_input_fig
+interactions = widgetbox(symbol_input_fig, px_dist_manual_input_fig, px_dist_manual_conviction_input_fig
                          , px_dist_crude_update_button, px_dist_normalize_button)
 
 curdoc().add_root(gridplot([ [desc]

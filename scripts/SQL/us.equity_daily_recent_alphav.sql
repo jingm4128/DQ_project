@@ -8,7 +8,7 @@ TRUNCATE TABLE us.equity_daily_recent_alphav;
 
 CREATE TABLE us.equity_daily_recent_alphav
 (
-    ticker VARCHAR(20) default null,
+    symbol VARCHAR(20) default null,
     date date default null,
     open float default null,
     high float default null,
@@ -19,6 +19,12 @@ CREATE TABLE us.equity_daily_recent_alphav
     cdiv float  default null,
     split_coeff float default null
 );
+
+
+ALTER TABLE us.equity_daily_recent_alphav CHANGE COLUMN ticker symbol VARCHAR(20);
+
+ALTER TABLE us.equity_daily_hist_alphav CHANGE COLUMN ticker symbol VARCHAR(20);
+
 
 delete from us.equity_daily_recent_alphav where date = '20181025';
 
@@ -41,8 +47,8 @@ LINES TERMINATED BY '\r\n'
 
 commit;
 
-insert into us.equity_daily_recent_alphav
-select * from us.equity_daily_hist_alphav where date>= '20170101';
+insert into us.equity_daily_hist_alphav
+select * from us.equity_daily_recent_alphav where date> '20180504' and date<='20181024';
 commit;
 
 ##################################################
@@ -50,15 +56,15 @@ commit;
 ##################################################
 select distinct cast(date as char) from us.equity_daily_recent_alphav;
 
-select distinct ticker from us.equity_daily_recent_alphav;
+select distinct symbol from us.equity_daily_recent_alphav;
 
-select * from us.equity_daily_recent_alphav where ticker not in (select distinct ticker from us.equity_daily_recent_alphav where date = '20180501');
+select * from us.equity_daily_recent_alphav where symbol not in (select distinct symbol from us.equity_daily_recent_alphav where date = '20180501');
 
 select * from us.equity_daily_recent_alphav limit 10;
 
-select * from us.equity_daily_recent_alphav where ticker = 'JNJ';
+select * from us.equity_daily_recent_alphav where symbol = 'JNJ';
 
-select * from us.equity_daily_recent_alphav where ticker = 'TIG';
+select * from us.equity_daily_recent_alphav where symbol = 'TIG';
 
 select * from us.equity_daily_recent_alphav where date = '2018-03-27';
 
